@@ -1,4 +1,4 @@
-# JSON Dereference CLI
+# JSON Dereference CLI v2
 
 *Very* simple CLI tool that wraps the
 excellent [json-schema-ref-parser](https://github.com/BigstickCarpet/json-schema-ref-parser) library.
@@ -9,11 +9,11 @@ excellent [json-schema-ref-parser](https://github.com/BigstickCarpet/json-schema
 
 ```bash
 # Using npx:
-npx json-dereference-cli -s <schema> [-i <spaces>] [-o <output>] [-t <type>]
+npx json-dereference-cli-v2 -s <schema> [-i <spaces>] [-o <output>] [-t <type>]
 
 # Installing globally:
-npm install -g json-dereference-cli
-json-dereference -s <schema>  [-i <spaces>] [-o <output>] [-t <type>]
+npm install -g json-dereference-cli-v2
+json-dereference-v2 -s <schema>  [-i <spaces>] [-o <output>] [-t <type>]
 ```
 
 *Note:* The input file can either be `json`, or `yaml` / `yml`.

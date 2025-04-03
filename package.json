@@ -3,7 +3,7 @@
   "author": "Siddharth Yadav",
   "description": "Provides a cli interface to the json-schema-ref-parser library",
   "bin": {
-    "json-dereference": "./dereference.js"
+    "json-dereference-v2": "./dereference.js"
   },
   "bugs": {
     "url": "https://github.com/sedflix/json-dereference-cli-v2/issues"
