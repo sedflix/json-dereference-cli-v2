@@ -1,0 +1,9 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema",
+  "type": "object",
+  "properties": {
+    "test": {
+      "$ref": "https://raw.githubusercontent.com/wrong/kubernetes-wrong-schema/master/master-standalone-strict/_definitions.json#/definitions/io.k8s.apimachinery.pkg.api.resource.Quantity"
+    }
+  }
+}

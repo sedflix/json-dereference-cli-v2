@@ -22,16 +22,15 @@
     "node": ">=4.3"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "((node dereference.js -s testdata/correct.schema.json && echo \"Success: exit code $?\") &&  (node dereference.js -s testdata/error.schema.json || echo \"Success: exit code $?\")) && echo \"Test Passed!\""
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/sedflix/json-dereference-cli-v2"
   },
   "dependencies": {
-    "aws-sdk": "^2.1303.0",
-    "@apidevtools/json-schema-ref-parser": "^10.0.1",
-    "minimist": "^1.2.7",
+    "@apidevtools/json-schema-ref-parser": "^11.9.3",
+    "minimist": "^1.2.8",
     "js-yaml": "^4.1.0"
   }
 }
