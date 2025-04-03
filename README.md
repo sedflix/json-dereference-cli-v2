@@ -3,6 +3,8 @@
 *Very* simple CLI tool that wraps the
 excellent [json-schema-ref-parser](https://github.com/BigstickCarpet/json-schema-ref-parser) library.
 
+[![Node.js Package](https://github.com/sedflix/json-dereference-cli-v2/actions/workflows/npm-publish.yml/badge.svg)](https://github.com/sedflix/json-dereference-cli-v2/actions/workflows/npm-publish.yml)
+
 ## Usage
 
 ```bash
