@@ -1,0 +1,540 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema",
+  "$ref": "#/$defs/cloudSQLDescription",
+  "if": {
+    "properties": {
+      "enabled": {
+        "const": true
+      }
+    }
+  },
+  "then": {
+    "$ref": "#/$defs/cloudSQLProperties"
+  },
+  "$defs": {
+    "cloudSQLDescription": {
+      "title": "Cloud SQL",
+      "description": "Create a Cloud SQL instance, with password, user, database; while storing the created credentials in Secret Manager as well as Kubernetes Secrets/Configmap. \n\n Enabling CloudSQL will, in addition to creating the CloudSQL instance and database, automatically generate CloudSQL user password, put it in GCP Secret Manager in your GCP Project and sync it into a Kubernetes Secret (`$service-$environment-sql-password`) with key name `DATABASE_PASSWORD` inside your namespace. It will also create a ConfigMap (`$service-$environment-sql-config`) containing the database connection details in keys `DATABASE_URL`, `DATABASE_USERNAME`, `DATABASE_INSTANCE_NAME`, `DATABASE_NAME`, `GCP_PROJECT_ID`, and `REGION`. \n\n **[See Feature Docs](https://foundry.int.king.com/docs/project/kcp-self-service-docs/latest/cloudsql)** \n\n **[See How to Connect](https://foundry.int.king.com/docs/project/kcp-self-service-docs/latest/cloudsql#how-to-connect-to-cloudsql-instance)**",
+      "type": "object",
+      "examples": [
+        {
+          "enabled": true,
+          "tier": "db-g1-small"
+        },
+        {
+          "enabled": true,
+          "tier": "db-g1-small",
+          "databaseUser": "event-definer",
+          "databaseName": "event-definer",
+          "configMap": {
+            "databaseUserKey": "DATABASE_USERNAME"
+          }
+        },
+        {
+          "enabled": true,
+          "availabilityType": "REGIONAL",
+          "charset": "UTF8",
+          "databaseInstanceName": "flow",
+          "databaseName": "flow",
+          "databaseUser": "flow",
+          "diskAutoresize": true,
+          "databaseVersion": "POSTGRES_15",
+          "diskSize": 250,
+          "edition": "ENTERPRISE_PLUS",
+          "tier": "db-perf-optimized-N-8",
+          "secret": {
+            "kubernetesSecretKeyName": "DB_PASSWORD",
+            "generateSecret": true
+          },
+          "configMap": {
+            "databaseUrlKey": "DB_URL",
+            "databaseUserKey": "DB_USER"
+          }
+        },
+        {
+          "enabled": true,
+          "databaseInstanceName": "$service-$env",
+          "databaseName": "$service",
+          "databaseUser": "$service",
+          "availabilityType": "REGIONAL",
+          "databaseVersion": "MYSQL_8_0",
+          "edition": "ENTERPRISE",
+          "tier": "db-g1-small",
+          "charset": "utf8mb4",
+          "collation": "utf8mb4_0900_ai_ci",
+          "diskAutoresize": true,
+          "diskSize": 10,
+          "diskType": "PD_SSD",
+          "databaseFlags": [
+            {
+              "name": "max_connections",
+              "value": "10000"
+            },
+            {
+              "name": "log_min_duration_statement",
+              "value": "1000"
+            }
+          ],
+          "backupConfiguration": {
+            "enabled": true,
+            "startTime": "04:00",
+            "binaryLogEnabled": true
+          },
+          "maintenanceWindow": {
+            "day": 7,
+            "hour": 0
+          },
+          "insightsConfig": {
+            "queryInsightsEnabled": false,
+            "queryPlansPerMinute": 5,
+            "queryStringLength": 1024,
+            "recordApplicationTags": false,
+            "recordClientAddress": false
+          },
+          "secret": {
+            "kubernetesSecretName": "$service-$env-sql-password",
+            "kubernetesSecretKeyName": "DATABASE_PASSWORD",
+            "gcpSecretManagerSecretName": "$service-$env-sql-password",
+            "generateSecret": true
+          },
+          "configMap": {
+            "databaseUrlKey": "DATABASE_URL",
+            "databaseUrlValue": "null",
+            "databaseUserKey": "DATABASE_USER"
+          }
+        }
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "enabled": {
+          "title": "Enable",
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "cloudSQLSimple": {
+      "$ref": "#/$defs/cloudSQLDescription",
+      "if": {
+        "properties": {
+          "enabled": {
+            "const": true
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "tier"
+        ],
+        "properties": {
+          "tier": {
+            "$ref": "#/$defs/cloudSQLProperties/properties/tier"
+          }
+        }
+      }
+    },
+    "cloudSQL": {
+      "$ref": "#/$defs/cloudSQLDescription",
+      "if": {
+        "properties": {
+          "enabled": {
+            "const": true
+          }
+        }
+      },
+      "then": {
+        "$ref": "#/$defs/cloudSQLProperties"
+      }
+    },
+    "cloudSQLProperties": {
+      "required": [
+        "tier"
+      ],
+      "properties": {
+        "databaseVersion": {
+          "title": "Database Version",
+          "description": "Choose the database version of the Cloud SQL/Database Instance. [See this all available versions](https://cloud.google.com/sql/docs/db-versions). Please change collation/charsets should be changed accordingly, if this is changed to non-mysql version.",
+          "type": "string",
+          "default": "MYSQL_8_0",
+          "examples": [
+            "MYSQL_8_0",
+            "MYSQL_8_0_31",
+            "POSTGRES_15"
+          ]
+        },
+        "tier": {
+          "title": "Machine Type/Tier",
+          "description": "Choose the machine type of the Cloud SQL instance. db-g1- types are cheapest but not covered by CloudSQL SLA. [See this for all available machine types](https://cloud.google.com/sql/docs/mysql/instance-settings#machine-type-2ndgen). Note different `editions` have different machine types availability",
+          "type": "string",
+          "examples": [
+            "db-g1-tiny",
+            "db-g1-small",
+            "db-n1-standard-1",
+            "db-n1-standard-2",
+            "db-n1-standard-4",
+            "db-n1-standard-8",
+            "db-n1-standard-16",
+            "db-n1-standard-32",
+            "db-n1-highmem-2",
+            "db-n1-highmem-8",
+            "db-perf-optimized-N-4",
+            "db-perf-optimized-N-8"
+          ]
+        },
+        "availabilityType": {
+          "title": "Availability Type",
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Choose the availability type of the Cloud SQL instance: High Availability (REGIONAL) or Single Zone (ZONAL). **Note: defaults to REGIONAL in live and ZONAL in non-live.**",
+          "enum": [
+            "ZONAL",
+            "REGIONAL"
+          ]
+        },
+        "enableIAMAuth": {
+          "title": "Enable IAM Authentication",
+          "description": "Enable IAM authentication for the Cloud SQL instance, your application can use Google Servie Account(via workload identity) to connect to the Database. [GCP CloudSQL IAM authentication](https://cloud.google.com/sql/docs/mysql/iam-authentication)",
+          "type": "boolean",
+          "x-immutable": true,
+          "default": false
+        },
+        "databaseInstanceName": {
+          "title": "CloudSQL Instance Name",
+          "description": "Name of the Cloud SQL instance. Defaults to `<service>-<env>` if not provided.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "databaseName": {
+          "title": "MySQL Database Name",
+          "description": "Name of the MySQL database. Defaults to `<service>` if not provided.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "databaseUser": {
+          "title": "MySQL Database User Name",
+          "description": "Name of the MySQL database user. Defaults to `<service>` if not provided.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "diskAutoresize": {
+          "title": "Disk Autoresize",
+          "description": "Enable/disable automatic disk resizing. When set to true, the diskSize variable will be ignored.",
+          "type": "boolean",
+          "default": true
+        },
+        "diskSize": {
+          "title": "Disk Size",
+          "description": "The size of data disk, in GB. Size of a running instance cannot be reduced but can be increased. The minimum value is 10GB. When diskAutoresize is set to true, the diskSize variable will be ignored.",
+          "type": "number",
+          "default": null
+        },
+        "diskType": {
+          "title": "Disk Type",
+          "description": "Choose the disk type of the Cloud SQL instance. SSDs provide lower latency and higher data throughput. If you do not need high-performance access to your data, for example for long-term storage or rarely accessed data, you can reduce your costs by choosing HDD. HDD requires Cloud SQL Enterprise",
+          "type": "string",
+          "enum": [
+            "PD_SSD",
+            "PD_HDD"
+          ],
+          "default": "PD_SSD"
+        },
+        "edition": {
+          "title": "Edition",
+          "description": "The edition of the instance, can be ENTERPRISE or ENTERPRISE_PLUS. Use ENTERPRISE_PLUS only for production and high performance databases. [See this for comparison between different editions](https://cloud.google.com/sql/docs/mysql/editions-intro)",
+          "type": "string",
+          "enum": [
+            "ENTERPRISE",
+            "ENTERPRISE_PLUS"
+          ],
+          "default": "ENTERPRISE"
+        },
+        "charset": {
+          "title": "MySQL Charset",
+          "description": "Choose the charset of the Cloud SQL instance. [MySQL Supported Character Sets and Collations](https://dev.mysql.com/doc/refman/8.4/en/charset-charsets.html) more details.",
+          "type": "string",
+          "examples": [
+            "utf8mb4",
+            "utf16"
+          ]
+        },
+        "collation": {
+          "title": "MySQL Collation",
+          "description": "Choose the collation of the Cloud SQL instance. Usually not required. See for [MySQL Supported Character Sets and Collations](https://dev.mysql.com/doc/refman/8.4/en/charset-charsets.html) more details.",
+          "type": "string",
+          "examples": [
+            "utf8mb4_0900_ai_ci",
+            "utf16_general_ci"
+          ]
+        },
+        "databaseFlags": {
+          "title": "Database Flags",
+          "description": "Database flags to be set on the Cloud SQL instance. For more information, see [list of MySQL Flags](https://cloud.google.com/sql/docs/mysql/flags#list-flags-mysql) and [list of PSQL flags](https://cloud.google.com/sql/docs/postgres/flags#list-flags-postgres)",
+          "type": "array",
+          "examples": [
+            [
+              {
+                "name": "max_connections",
+                "value": "10000"
+              },
+              {
+                "name": "log_min_duration_statement",
+                "value": "1000"
+              }
+            ]
+          ],
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "title": "Flag Name",
+                "type": "string",
+                "minLength": 1
+              },
+              "value": {
+                "title": "Flag Value",
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "name",
+              "value"
+            ]
+          }
+        },
+        "backupConfiguration": {
+          "title": "Backup Configuration",
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "title": "Enable",
+              "type": "boolean",
+              "default": true
+            },
+            "startTime": {
+              "title": "Backup Start Time",
+              "description": "HH:MM format time indicating when backup configuration starts.",
+              "type": "string",
+              "default": "04:00"
+            },
+            "binaryLogEnabled": {
+              "title": "Enable Binary Logging",
+              "description": "For Cloud SQL for MySQL, point-in-time recovery requires that you enable binary logging. This means that every update to your database is written to an independent log, which involves a small reduction in write performance. Performance of read operations are unaffected by binary logging, regardless of the size of the binary log files.",
+              "type": "boolean",
+              "default": false
+            }
+          }
+        },
+        "maintenanceWindow": {
+          "title": "Maintenance Window",
+          "description": "The day of the week and the hour in which Cloud SQL schedules maintenance. Maintenance windows last for one hour. [More info](https://cloud.google.com/sql/docs/mysql/maintenance)",
+          "type": "object",
+          "properties": {
+            "day": {
+              "title": "Day",
+              "description": "Day of week (1-7), starting on Monday.",
+              "type": "number",
+              "default": 7
+            },
+            "hour": {
+              "title": "Hour",
+              "description": "Hour of day (0-23), ignored if day not set.",
+              "type": "number",
+              "default": 0
+            }
+          }
+        },
+        "insightsConfig": {
+          "title": "Insights Configuration",
+          "description": "See [Using Query Insights](https://cloud.google.com/sql/docs/postgres/using-query-insights) and [Use System Insights](https://cloud.google.com/sql/docs/postgres/use-system-insights) for more details",
+          "type": "object",
+          "properties": {
+            "queryInsightsEnabled": {
+              "title": "Enable Query Insights",
+              "type": "boolean",
+              "default": false
+            },
+            "queryPlansPerMinute": {
+              "title": "Query Plans Per Minute",
+              "description": "Number of query execution plans captured by Insights per minute for all queries combined. Between 0 and 20. Default to 5.",
+              "type": "number",
+              "default": 5
+            },
+            "queryStringLength": {
+              "title": "Query String Length",
+              "description": "Maximum query length stored in bytes. Between 256 and 4500. Default to 1024. Higher query lengths are more useful for analytical queries, but they also require more memory. Changing the query length requires you to restart the instance. You can still add tags to queries that exceed the length limit.",
+              "type": "number",
+              "default": 1024
+            },
+            "recordApplicationTags": {
+              "title": "Record Application Tags",
+              "description": "True if Query Insights will record application tags from query when enabled",
+              "type": "boolean",
+              "default": false
+            },
+            "recordClientAddress": {
+              "title": "Record Client Address",
+              "description": "True if Query Insights will record client address when enabled",
+              "type": "boolean",
+              "default": false
+            }
+          }
+        },
+        "secret": {
+          "title": "Database Password Secret",
+          "description": "Manage the database credentials in Secret Manager and Kubernetes Secret/ConfigMap. Leave it empty to auto-generate password and store it in `DATABASE_PASSWORD` key in `<service>-<env>-sql-password` named kubernetes secret and also in GSM with `<service>-<env>-sql-password` name. You can view the password in google secret manager.",
+          "type": "object",
+          "examples": [
+            {
+              "kubernetesSecretName": "db-pass-k8s-secret",
+              "kubernetesSecretKeyName": "db-pass",
+              "gcpSecretManagerSecretName": "db-pass",
+              "generateSecret": true
+            }
+          ],
+          "properties": {
+            "kubernetesSecretName": {
+              "title": "Kubernetes Secret Name",
+              "description": "Kubernetes Secret Name for storing DB Password. Defaults to `<service>-<env>-sql-password` if not provided.",
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "kubernetesSecretKeyName": {
+              "title": "Secret Key Name in kubernetesSecretName which stores the password. Defaults to `DATABASE_PASSWORD` if not provided.",
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "gcpSecretManagerSecretName": {
+              "title": "Google Secret Manager Secret Name for storing DB Password. Defaults to `<service>-<env>-sql-password` if not provided.",
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "generateSecret": {
+              "title": "Automatically generate a random secret and saves it in GSM",
+              "type": "boolean",
+              "default": true
+            }
+          }
+        },
+        "configMap": {
+          "title": "Database Details ConfigMap",
+          "description": "This section creates a Kubernetes ConfigMap that stores essential connection details for the Cloud SQL database like DATABASE_INSTANCE_NAME, REGION, DATABASE_NAME, GCP_PROJECT_ID, and DATABASE_URL.",
+          "type": "object",
+          "properties": {
+            "databaseUrlKey": {
+              "title": "Database URL ConfigMap Key",
+              "description": "Key name to store the Database URL in the ConfigMap. Defaults to `DATABASE_URL` if not provided.",
+              "type": "string",
+              "default": "DATABASE_URL"
+            },
+            "databaseUserKey": {
+              "title": "Database User Name ConfigMap Key",
+              "description": "Key name to store the Database User in the ConfigMap. Defaults to `DATABASE_USERNAME` if not provided.",
+              "type": "string",
+              "default": "DATABASE_USERNAME"
+            },
+            "databaseUrlValue": {
+              "title": "Database URL Value",
+              "description": "Database URL value in ConfigMap. Leave it emtpy unless some especial setting is required. Defaults to `jdbc:mysql:///<databaseUser>?cloudSqlInstance=<gcpProjectID>:<region>:<instanceName>&ipTypes=PRIVATE&socketFactory=com.google.cloud.sql.mysql.SocketFactory&useServerPrepStmts=false&serverTimezone=CET`",
+              "type": [
+                "string",
+                "null"
+              ],
+              "examples": [
+                "jdbc:mysql:///service1?cloudSqlInstance=king-project-prod:eu-west1:service1-env1&ipTypes=PRIVATE&socketFactory=com.google.cloud.sql.mysql.SocketFactory&useServerPrepStmts=false&serverTimezone=CET",
+                "jdbc:postgresql:///flow?cloudSqlInstance=king-cdro-prod:europe-west1:flow&socketFactory=com.google.cloud.sql.postgres.SocketFactory&ipTypes=PRIVATE"
+              ]
+            },
+            "additionalDBUrlParameters": {
+              "title": "Additional Database URL Parameters",
+              "type": "object",
+              "examples": [
+                {
+                  "useServerPrepStmts": "false",
+                  "serverTimezone": "CET"
+                }
+              ],
+              "additionalProperties": {
+                "type": "string"
+              },
+              "description": "Additional parameters to be appended to the DB URL. Provide parameters as key-value pairs, which will be appended to the database URL in the format `&key=value`."
+            }
+          }
+        },
+        "enablePrivatePathForGoogleCloudServices": {
+          "title": "Enable Private Path for Google Cloud Services",
+          "description": "Controls connectivity to private IP instances from Google services, such as BigQuery. If you want to allow other Google Cloud services, such as BigQuery, to access data in Cloud SQL and make queries against this data over a private IP connection, then enable this option",
+          "type": "boolean",
+          "default": false,
+          "ui:widget": "hidden"
+        },
+        "bigQueryConnection": {
+          "title": "BigQuery Connection",
+          "description": "Create a BigQuery connection to the Cloud SQL instance. This will allow you to query the Cloud SQL instance from BigQuery.  \n We create a new Database User and Password for the BigQuery Connection. We provide BQ Service Agent with `roles/cloudsql.client` role. We also enable `PrivatePathForGoogleCloudServices` in the CloudSQL Instance. [See this for more details](https://cloud.google.com/bigquery/docs/cloud-sql-federated-queries)",
+          "properties": {
+            "enabled": {
+              "title": "Enable",
+              "type": "boolean",
+              "default": false
+            },
+            "location": {
+              "title": "Location",
+              "description": "The geographic location where the connection should reside. Cloud SQL instance must be in the same location. We set it to the region(like europe-west1) for `ZONAL` SQL Instance and region to `EU` for `REGIONAL` SQL Instance.",
+              "x-immutable": true,
+              "examples": [
+                "europe-west1",
+                "EU",
+                "europe-west4"
+              ]
+            },
+            "friendlyName": {
+              "title": "Friendly Name",
+              "description": "If not provided, defaults to $instanceName-$databaseName "
+            },
+            "connectionId": {
+              "title": "Connection ID",
+              "description": "If not provided, defaults to $instanceName-$databaseName ",
+              "x-immutable": true
+            },
+            "description": {
+              "description": "A descriptive description for the connection"
+            },
+            "overrideGcpProject": {
+              "title": "Override GCP Project for the Connection",
+              "description": "If not provided, it will use the `gcpProjectID` defined above.",
+              "x-immutable": true
+            }
+          }
+        }
+      },
+      "if": {
+        "properties": {
+          "diskAutoresize": {
+            "const": true
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "diskSize": {
+            "type": "null"
+          }
+        }
+      }
+    }
+  }
+}

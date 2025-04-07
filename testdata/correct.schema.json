@@ -1,9 +1,12 @@
 {
-  "$schema": "https://json-schema.org/draft-07/schema",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
   "properties": {
     "test": {
       "$ref": "https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/master-standalone-strict/_definitions.json#/definitions/io.k8s.apimachinery.pkg.api.resource.Quantity"
+    },
+    "cloudSQL": {
+      "$ref": "cloudSQL.schema.json#/$defs/cloudSQL"
     }
   }
 }
