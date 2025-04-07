@@ -22,7 +22,7 @@
     "node": ">=4.3"
   },
   "scripts": {
-    "test": "node dereference.js -s testdata/correct.schema.json -o testdata/output.json && echo 'Correct schema test passed!' && node dereference.js -s testdata/error.schema.json || echo 'Error schema test passed!' && echo 'Meta-validation test passed!'"
+    "test": "node dereference.js -s testdata/correct.schema.json -o testdata/output.json && echo 'Correct schema test passed!' && node dereference.js -s testdata/error.schema.json || echo 'Error schema test passed!' && node dereference.js -s testdata/correct.schema.json -t yaml && echo 'YAML output test passed!' && node dereference.js -s testdata/correct.schema.json --no-validate && echo 'No validation test passed!' && echo 'Meta-validation test passed!'"
   },
   "repository": {
     "type": "git",
