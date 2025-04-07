@@ -11,6 +11,11 @@
           "type": "number"
         }
       ]
+    },
+    "test2": {
+      "type": "boolean",
+      "description": "A boolean value indicating true or false",
+      "x-imutable": true
     }
   }
 }
