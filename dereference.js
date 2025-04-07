@@ -86,7 +86,8 @@ function detectSchemaVersion(schema) {
     const schemaUrl = schema.$schema;
 
     if (!schemaUrl) {
-        throw new Error('Missing $schema property in the JSON Schema.');
+        console.warn('No $schema property found. Defaulting to draft-07 schema.');
+        return 'draft-07';
     }
 
     if (schemaUrl.includes('draft/2020-12')) {
