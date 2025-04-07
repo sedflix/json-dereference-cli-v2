@@ -6,21 +6,6 @@ const $RefParser = require('@apidevtools/json-schema-ref-parser');
 const argv = require('minimist')(process.argv.slice(2));
 const yaml = require('js-yaml');
 
-// for schema validation
-const Ajv = require('ajv');
-const addFormats = require('ajv-formats');
-// Initialize Ajv with 2020-12 draft support
-const ajv = new Ajv({
-    strict: false,
-    allowUnionTypes: true,
-    validateSchema: false, // Skip schema validation initially
-});
-addFormats(ajv);
-// Load the 2020-12 meta-schema
-const draft202012MetaSchema = require('ajv/dist/refs/json-schema-2020-12/schema.json');
-ajv.addMetaSchema(draft202012MetaSchema);
-
-
 
 // Argument handling
 if (!argv.s) {
@@ -40,17 +25,6 @@ $RefParser.dereference(input, {resolve: {}}, function (err, schema) {
         process.exit(1);
         return
     }
-
-
-    // Validate the schema using ajv
-    const validate = ajv.compile(schema);
-    const valid = validate(schema);
-    if (valid) {
-        console.log('Schema validated successfully!.');
-    } else {
-        console.error("Schema schema validation failed!", validate.errors);
-    }
-
 
     // Detect output format
     var type = 'json'
