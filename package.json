@@ -16,7 +16,7 @@
     "cli",
     "tool"
   ],
-  "version": "4.0.2",
+  "version": "4.0.3",
   "main": "index.js",
   "engines": {
     "node": ">=4.3"
