@@ -4,9 +4,6 @@
   "properties": {
     "test": {
       "$ref": "https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/master-standalone-strict/_definitions.json#/definitions/io.k8s.apimachinery.pkg.api.resource.Quantity"
-    },
-    "cloudSQL": {
-      "$ref": "cloudSQL.schema.json#/$defs/cloudSQL"
     }
   }
 }
