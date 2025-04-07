@@ -65,7 +65,10 @@ function validateSchemaMeta(schema, schemaVersion) {
         ajv = new Ajv2020();
     } else if (schemaVersion === 'draft-07') {
         ajv = new Ajv();
-        ajv.addMetaSchema(require('ajv/lib/refs/json-schema-draft-07.json'));
+        const draft07MetaSchema = require('ajv/lib/refs/json-schema-draft-07.json');
+        if (!ajv.getSchema(draft07MetaSchema.$id)) {
+            ajv.addMetaSchema(draft07MetaSchema);
+        }
     } else {
         throw new Error(`Unsupported schema version: ${schemaVersion}`);
     }
