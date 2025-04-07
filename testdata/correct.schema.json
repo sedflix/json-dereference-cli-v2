@@ -4,6 +4,13 @@
   "properties": {
     "test": {
       "$ref": "https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/master-standalone-strict/_definitions.json#/definitions/io.k8s.apimachinery.pkg.api.resource.Quantity"
+    },
+    "test2": {
+
+      "type": "boolean",
+      "description": "A boolean value indicating true or false",
+      "x-imutable": true
+
     }
   }
 }
