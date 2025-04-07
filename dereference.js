@@ -85,12 +85,16 @@ function validateSchemaMeta(schema, schemaVersion) {
 function detectSchemaVersion(schema) {
     const schemaUrl = schema.$schema;
 
+    if (!schemaUrl) {
+        throw new Error('Missing $schema property in the JSON Schema.');
+    }
+
     if (schemaUrl.includes('draft/2020-12')) {
         return '2020-12';
     } else if (schemaUrl.includes('draft-07')) {
         return 'draft-07';
     } else {
-        throw new Error('Unsupported or missing $schema property in the JSON Schema.');
+        throw new Error('Unsupported $schema property in the JSON Schema: ' + schemaUrl);
     }
 }
 
